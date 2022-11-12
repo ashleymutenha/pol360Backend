@@ -1,0 +1,1 @@
+web gunicorn pol36.wsgi:application --log-file -
