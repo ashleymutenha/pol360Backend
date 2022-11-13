@@ -8,5 +8,6 @@ urlpatterns =[
     path('addBroker',views.addBroker),
     path('getBrokers', views.getBrokers),
     path('deleteBroker', views.deleteBroker),
-    path('setasdefault',views.setAsDefault)
+    path('setasdefault',views.setAsDefault),
+    path('editBroker',views.editBroker)
 ]

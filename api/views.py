@@ -10,6 +10,7 @@ from .models import Details,Brokers
 from .serialiser import DetailsSerialiser
 import json
 from django.core import serializers
+import requests
 
 
 
@@ -132,7 +133,7 @@ def addBroker(request):
                 broker = Brokers.objects.create(brokers=request.data, status =request.data['status'])
                 broker.save()
             brokers = serializers.serialize('json', Brokers.objects.all())
-            print(request.data['status'])
+            
 
             
             b = json.loads(brokers)
@@ -159,12 +160,14 @@ def addBroker(request):
 
 @api_view(['GET'])
 def getBrokers(request):
+    # __details = Brokers.objects.all()
+    # __details.delete()
     if request.data!=None:
         brokers = serializers.serialize('json', Brokers.objects.all())
         filteredData =[]
         brokersList  =json.loads(brokers)
 
-        print(brokersList)
+       
 
         for i in brokersList:
             if i['fields']['status'] =='active':
@@ -249,6 +252,52 @@ def setAsDefault(request):
                 }
 
                 return Response(__response)
+
+@api_view(['POST'])
+def editBroker(request):
+    data =request.data
+    if data!=None:
+        try:
+            brokers = serializers.serialize('json', Brokers.objects.all())
+
+            brokerList = json.loads(brokers)
+            print(checkOccurrence(brokerList,data['brokerName']))
+            if checkOccurrence(brokerList,data['brokerName']) !=0:
+                for i in brokerList:
+                    if i['fields']['brokers']['brokerName'] ==data['brokerName']:
+                        _id = i['pk']
+                
+                Brokers.objects.filter(id=_id).update(brokers =data)
+            else:
+                Brokers.objects.create(brokers =data, status =data['status'])
+
+
+
+            __response ={
+                    'response':'success'
+                }
+
+            return Response(__response)
+
+        except:
+            __response ={
+                    'response':'failure'
+                }
+
+            return Response(__response)
+
+
+def checkOccurrence(data,name):
+    count =0
+    for i in data:
+        if i['fields']['brokers']['brokerName'] ==name:
+            count+=1
+
+    return count
+
+
+
+
 
                 
 
